@@ -146,7 +146,7 @@ function GamePhase2({ game, player, gameState, ws }) {
           <div className="card">
             <h3>请选择使用的肥料类型：</h3>
             <button
-              className="choice-button organic"
+              className={`choice-button organic${selectedChoice === 'organic' ? ' selected' : ''}`}
               onClick={() => setSelectedChoice('organic')}
               style={{
                 backgroundColor: selectedChoice === 'organic' ? '#38ef7d' : '#e0e0e0'
@@ -159,7 +159,7 @@ function GamePhase2({ game, player, gameState, ws }) {
               <small>本轮收益：{baseEarnings('organic')}NT（ENV 仅在全部15轮结束后折算）</small>
             </button>
             <button
-              className="choice-button inorganic"
+              className={`choice-button inorganic${selectedChoice === 'inorganic' ? ' selected' : ''}`}
               onClick={() => setSelectedChoice('inorganic')}
               style={{
                 backgroundColor: selectedChoice === 'inorganic' ? '#f45c43' : '#e0e0e0'

@@ -51,6 +51,104 @@ body {
   }
 }
 
+/* ========== 游戏页：左侧玩家列表 + 主内容 ========== */
+.game-page-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  width: 100%;
+  max-width: 1100px;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.player-list-sidebar {
+  flex-shrink: 0;
+  width: 180px;
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(102, 126, 234, 0.15);
+}
+
+.player-list-sidebar__title {
+  font-size: 1rem;
+  color: #667eea;
+  margin-bottom: 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.player-list-sidebar__hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.player-list-sidebar__list {
+  list-style: none;
+}
+
+.player-list-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.player-list-sidebar__item:last-child {
+  border-bottom: none;
+}
+
+.player-list-sidebar__check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  color: transparent;
+  font-weight: bold;
+}
+
+.player-list-sidebar__check.checked {
+  background: #38ef7d;
+  border-color: #11998e;
+  color: #0d3b1a;
+}
+
+.player-list-sidebar__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.game-main .container {
+  max-width: 800px;
+}
+
+@media (max-width: 768px) {
+  .game-page-layout {
+    flex-direction: column;
+  }
+  .player-list-sidebar {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
 /* 阶段·轮次标题 */
 .phase-round-header {
   text-align: center;
@@ -219,6 +317,16 @@ input:not([type=radio]):not([type=checkbox]):focus {
   background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
 }
 
+/* 选中态：字体加粗、深色，一眼能看出选了什么 */
+.choice-button.selected {
+  font-weight: 700;
+  color: #111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.25);
+}
+.choice-button.selected small {
+  color: #222;
+}
+
 .stats {
   display: flex;
   flex-wrap: wrap;
@@ -280,6 +388,11 @@ input:not([type=radio]):not([type=checkbox]):focus {
   width: 100%;
   margin: 5px 0;
   text-align: left;
+}
+
+.vote-button.selected {
+  font-weight: 700;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.25);
 }
 
 .loading {

@@ -174,7 +174,7 @@ function GamePhase3({ game, player, gameState, ws }) {
           ) : (
             <>
               <button
-                className="vote-button"
+                className={`vote-button${selectedVote === 0 ? ' selected' : ''}`}
                 onClick={() => setSelectedVote(0)}
                 style={{
                   backgroundColor: selectedVote === 0 ? '#9e9e9e' : '#e0e0e0',
@@ -187,7 +187,7 @@ function GamePhase3({ game, player, gameState, ws }) {
               {votingApplicants.map((applicant) => (
                 <button
                   key={applicant.player_id}
-                  className="vote-button"
+                  className={`vote-button${selectedVote === applicant.player_id ? ' selected' : ''}`}
                   onClick={() => setSelectedVote(applicant.player_id)}
                   style={{
                     backgroundColor: selectedVote === applicant.player_id ? '#667eea' : '#e0e0e0',
@@ -259,7 +259,7 @@ function GamePhase3({ game, player, gameState, ws }) {
           <div className="card">
             <h3>请选择使用的肥料类型：</h3>
             <button
-              className="choice-button organic"
+              className={`choice-button organic${selectedChoice === 'organic' ? ' selected' : ''}`}
               onClick={() => setSelectedChoice('organic')}
               style={{
                 backgroundColor: selectedChoice === 'organic' ? '#38ef7d' : '#e0e0e0'
@@ -272,7 +272,7 @@ function GamePhase3({ game, player, gameState, ws }) {
               <small>本轮收益：{baseEarnings('organic')}NT</small>
             </button>
             <button
-              className="choice-button inorganic"
+              className={`choice-button inorganic${selectedChoice === 'inorganic' ? ' selected' : ''}`}
               onClick={() => setSelectedChoice('inorganic')}
               style={{
                 backgroundColor: selectedChoice === 'inorganic' ? '#f45c43' : '#e0e0e0'

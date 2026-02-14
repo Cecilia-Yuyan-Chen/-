@@ -365,6 +365,12 @@ async def handle_submit_choice(game_id: int, player_id: int, data: dict):
             "submitted": True
         }
         
+        # 广播「谁已选择」给房间内所有人，方便大家看到进度
+        await manager.broadcast_to_all_in_game({
+            "type": "submission_status",
+            "submitted_player_ids": list(game_states[game_id].keys())
+        }, game_id)
+        
         # 检查是否所有玩家都已提交
         players = db.query(GamePlayer).filter(GamePlayer.game_id == game_id).all()
         all_submitted = len(game_states[game_id]) == len(players)
@@ -406,13 +412,18 @@ async def handle_submit_vote(game_id: int, player_id: int, data: dict):
         db.add(vote)
         db.commit()
         
-        # 检查是否所有玩家都已投票
-        players = db.query(GamePlayer).filter(GamePlayer.game_id == game_id).all()
+        # 广播「谁已投票」给房间内所有人
         votes = db.query(GameVote).filter(
             GameVote.game_id == game_id,
             GameVote.round_number == round_number
         ).all()
+        await manager.broadcast_to_all_in_game({
+            "type": "vote_submission_status",
+            "submitted_player_ids": [v.voter_id for v in votes]
+        }, game_id)
         
+        # 检查是否所有玩家都已投票
+        players = db.query(GamePlayer).filter(GamePlayer.game_id == game_id).all()
         if len(votes) == len(players):
             # 处理投票结果
             await process_voting_phase(game_id, db)
@@ -587,7 +598,8 @@ async def process_phase3_subsidy_broadcast(game_id: int, round_number: int, choi
     await manager.broadcast_to_all_in_game({
         "type": "voting_start",
         "message": "请对申请补贴的玩家进行投票质疑",
-        "applicants": subsidy_applicants
+        "applicants": subsidy_applicants,
+        "vote_submitted_player_ids": []
     }, game_id)
 
 async def process_voting_phase(game_id: int, db: Session):
@@ -825,7 +837,8 @@ async def check_next_round_or_phase(game_id: int, db: Session):
         "message": f"进入第 {game.current_round} 轮",
         "current_round": game.current_round,
         "phase": game.phase,
-        "players": players_data
+        "players": players_data,
+        "submitted_player_ids": []
     }, game_id)
 
 async def finish_game(game_id: int, db: Session):

@@ -6,6 +6,7 @@ import PhaseIntro from './components/PhaseIntro'
 import GamePhase1 from './components/GamePhase1'
 import GamePhase2 from './components/GamePhase2'
 import GamePhase3 from './components/GamePhase3'
+import PlayerListSidebar from './components/PlayerListSidebar'
 import Results from './components/Results'
 import { useWebSocket } from './services/websocket'
 import { api } from './services/api'
@@ -63,8 +64,14 @@ function App() {
         broadcast: null,
         phase2_broadcasts: null,
         voting_phase: false,
+        submitted_player_ids: message.submitted_player_ids || [],
+        vote_submitted_player_ids: [],
         ...(message.players && { players: message.players })
       }))
+    } else if (type === 'submission_status') {
+      setGameState(prev => ({ ...prev, submitted_player_ids: message.submitted_player_ids || [] }))
+    } else if (type === 'vote_submission_status') {
+      setGameState(prev => ({ ...prev, vote_submitted_player_ids: message.submitted_player_ids || [] }))
     } else if (type === 'phase2_broadcasts') {
       setGameState(prev => ({ ...prev, phase2_broadcasts: message }))
     } else if (type === 'subsidy_applied') {
@@ -77,7 +84,8 @@ function App() {
       setGameState(prev => ({
         ...prev,
         voting_phase: true,
-        voting_applicants: message.applicants || []
+        voting_applicants: message.applicants || [],
+        vote_submitted_player_ids: message.vote_submitted_player_ids || []
       }))
     } else if (type === 'game_finished') {
       setGameState(prev => ({ ...prev, status: 'finished' }))
@@ -217,33 +225,39 @@ function App() {
       )
     }
 
-    if (phase === 1) {
-      return (
-        <GamePhase1
-          game={game}
-          player={player}
-          gameState={gameState}
-          ws={ws}
+    const players = gameState.players || []
+    const hasRoundResult = !!gameState.round_result
+    const isVotingPhase = gameState.voting_phase && !hasRoundResult
+    const submittedIds = hasRoundResult
+      ? players.map((p) => p.id)
+      : isVotingPhase
+        ? (gameState.vote_submitted_player_ids || [])
+        : (gameState.submitted_player_ids || [])
+    const sidebarLabel = isVotingPhase ? '已投票' : '已选择'
+
+    const gameLayout = (
+      <div className="game-page-layout">
+        <PlayerListSidebar
+          players={players}
+          submittedPlayerIds={submittedIds}
+          label={sidebarLabel}
         />
-      )
-    } else if (phase === 2) {
-      return (
-        <GamePhase2
-          game={game}
-          player={player}
-          gameState={gameState}
-          ws={ws}
-        />
-      )
-    } else if (phase === 3) {
-      return (
-        <GamePhase3
-          game={game}
-          player={player}
-          gameState={gameState}
-          ws={ws}
-        />
-      )
+        <div className="game-main">
+          {phase === 1 && (
+            <GamePhase1 game={game} player={player} gameState={gameState} ws={ws} />
+          )}
+          {phase === 2 && (
+            <GamePhase2 game={game} player={player} gameState={gameState} ws={ws} />
+          )}
+          {phase === 3 && (
+            <GamePhase3 game={game} player={player} gameState={gameState} ws={ws} />
+          )}
+        </div>
+      </div>
+    )
+
+    if (phase === 1 || phase === 2 || phase === 3) {
+      return gameLayout
     }
   }
 
