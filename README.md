@@ -1,0 +1,149 @@
+# 迷雾南塘 - 生态博弈游戏
+
+一个基于网页的互动博弈游戏，玩家需要在生态保护和收益之间做出选择。
+
+## 功能特点
+
+- 🌫️ **Phase 1: 迷雾村庄** (1-5轮) - 信息不透明，看不到他人选择
+- 📖 **Phase 2: 公共账本** (6-10轮) - 可以看到自己的生态值和期望收益，可以申请补贴
+- 👥 **Phase 3: 数字村民** (11-15轮) - 增加投票质疑机制，识破概率提高
+- 📊 **数据记录** - 自动生成Excel表格记录每轮数据
+- 🏆 **最终结算** - 生态值转换为NT，最高者获得NFT奖励
+
+## 技术栈
+
+- **后端**: Python + FastAPI + WebSocket + SQLite
+- **前端**: React + JavaScript + WebSocket
+- **数据导出**: openpyxl
+
+## 安装和运行
+
+### 后端设置
+
+1. 进入后端目录：
+```bash
+cd backend
+```
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+3. 运行服务器：
+```bash
+python -m app.main
+```
+
+或者使用uvicorn：
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+后端将在 `http://localhost:8000` 运行
+
+### 前端设置
+
+1. 进入前端目录：
+```bash
+cd frontend
+```
+
+2. 安装依赖：
+```bash
+npm install
+```
+
+3. 运行开发服务器：
+```bash
+npm run dev
+```
+
+前端将在 `http://localhost:3000` 运行
+
+## 游戏规则 （数值可在game_logic.py里调试）
+
+### 初始状态
+- 每位玩家初始NT: 10
+- 每位玩家初始生态值: 0
+
+### 选择机制
+
+**选项A: 有机肥**
+- 基础收益: 3NT
+- 自己生态值: +1
+- 其他所有人生态值: +0.5
+
+**选项B: 无机肥**
+- 基础收益: 6NT
+- 自己生态值: -1
+- 其他所有人生态值: -0.5
+
+### 生态值影响收益
+- 每10点生态值 = +0.5NT基础收益
+- 收益限制: 50% ~ 200%基础收益
+  - 有机肥: 1.5NT ~ 6NT
+  - 无机肥: 3NT ~ 12NT
+
+### Phase 2: 公共账本
+- 可以看到自己的生态值和期望收益
+- 可以申请生态补贴（1.5NT，需质押1.5NT）
+- 使用无机肥申请补贴有一定概率被识破（30%）
+
+### Phase 3: 数字村民
+- 生态补贴提高到2NT（需质押2NT）
+- 识破概率提高到50%
+- 增加投票质疑机制
+- 被投票质疑的玩家如果作弊，100%被识破
+- 识破后不仅扣除质押，还失去本轮收益
+- 投票者平分罚没收益
+
+### 最终结算
+- 正生态值: 每1点 = 0.5NT
+- 负生态值: 每-1点 = -1NT
+- 生态值最高者获得"南塘生态大王"NFT
+
+## 项目结构
+
+```
+迷雾南塘/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py          # FastAPI主应用
+│   │   ├── models.py         # 数据库模型
+│   │   ├── schemas.py        # Pydantic模型
+│   │   ├── game_logic.py     # 游戏逻辑
+│   │   ├── websocket.py      # WebSocket处理
+│   │   └── excel_export.py   # Excel导出
+│   ├── requirements.txt
+│   └── game.db              # SQLite数据库（自动生成）
+├── frontend/
+│   ├── src/
+│   │   ├── components/      # React组件
+│   │   ├── services/        # API和WebSocket服务
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── vite.config.js
+└── README.md
+```
+
+## 注意事项
+
+1. 确保后端和前端同时运行
+2. 游戏需要至少2名玩家才能开始
+3. 所有玩家的选择都是保密的（不公布肥料类型）
+4. 游戏数据会自动保存到数据库
+5. 游戏结束后可以下载Excel数据表格
+
+## 开发说明
+
+- 后端API文档: `http://localhost:8000/docs` (FastAPI自动生成)
+- WebSocket连接: `ws://localhost:8000/ws/game/{game_id}/player/{player_id}`
+- 数据库文件: `backend/game.db` (SQLite)
+- Excel导出目录: `backend/exports/`
+
+## 许可证
+
+MIT License
